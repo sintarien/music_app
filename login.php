@@ -1,3 +1,34 @@
+<?php
+session_start();
+require('./dbconnect.php');
+
+//postされたデータのemailとpasswordをdbから照合する
+if(!empty($_POST)){
+  if($_POST['email'] !== '' && $_POST['password'] !== ''){
+    $login = $db->prepare('SELECT * FROM members WHERE email=? AND password=?');
+    $login->execute(array(
+      $_POST['email'],
+      sha1($_POST['password'])
+    ));
+    $member = $login->fetch();
+    // var_dump($member);
+    if($member){
+      $_SESSION['id'] = $member['id'];
+      $_SESSION['time'] = time();
+      header('Location: index.php');
+      exit();
+    }else{
+      $error['login'] = 'failed';
+    }
+    //$_POST['email']または$_POST['password']のどちらかが空だった場合の処理
+  }else{
+    var_dump("asdfdasf");
+
+    $error['login'] = 'blank';
+  }
+}
+?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -22,6 +53,12 @@
         <dt>メールアドレス</dt>
         <dd>
           <input type="text" name="email" size="35" maxlength="255" value="<?php echo htmlspecialchars($_POST['email']); ?>" />
+          <?php if($error['login'] === 'blank'): ?>
+            <p class="error">*メールアドレスとパスワードを入力してください</p>
+          <?php endif; ?>
+          <?php if($error['login'] === 'failed'): ?>
+            <p class="error">*ログインに失敗しました。正しくご記入ください</p>
+          <?php endif; ?>
         </dd>
         <dt>パスワード</dt>
         <dd>
