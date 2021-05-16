@@ -10,6 +10,7 @@ if($_COOKIE['email'] !== ''){
 //postされたデータのemailとpasswordをdbから照合する
 if(!empty($_POST)){
   $email = $_POST['email'];
+
   if($_POST['email'] !== '' && $_POST['password'] !== ''){
     $login = $db->prepare('SELECT * FROM members WHERE email=? AND password=?');
     $login->execute(array(
@@ -34,7 +35,7 @@ if(!empty($_POST)){
     }
     //$_POST['email']または$_POST['password']のどちらかが空だった場合の処理
   }else{
-    var_dump("asdfdasf");
+    // var_dump("asdfdasf");
 
     $error['login'] = 'blank';
   }
