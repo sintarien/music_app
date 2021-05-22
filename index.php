@@ -94,8 +94,11 @@ if(isset($_REQUEST['res'])){
    <a href="view.php?id=<?php print(htmlspecialchars($post['reply_message_id	'])); ?>">
   返信元のメッセージ</a>
   <?php endif; ?>
-[<a href="delete.php?id="
-style="color: #F33;">削除</a>]
+
+  <!-- ログインユーザーの投稿であれば削除ボタンを表示 -->
+  <?php if($_SESSION['id'] == $post['member_id']): ?>
+    [<a href="delete.php?id=<?php print(htmlspecialchars($post['id'])); ?>"style="color: #F33;">削除</a>]
+  <?php endif; ?>
     </p>
     </div>
 <?php endforeach; ?>
