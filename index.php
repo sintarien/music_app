@@ -35,8 +35,29 @@ if(!empty($_POST)){
     exit();
   }
 }
-//投稿されたデータをcreatedが新しい物から順に取得
-$posts = $db->query('SELECT m.name, m.user_image, p.* FROM members m, posts p WHERE m.id=p.member_id ORDER BY p.created DESC');
+
+
+$page = $_REQUEST['page'];
+// ページが指定されなければ1ページ目を表示する
+if($page == ''){
+  $page = 1;
+}
+$page = max($page,1);
+
+// 投稿件数を取得
+$counts = $db->query('SELECT COUNT(*) AS cnt FROM posts');
+$cnt = $counts->fetch();
+$maxPage = ceil($cnt['cnt'] / 5);
+//取得したページ以上の数字を指定しても$maxPage以上の数字にしない
+$page = min($page, $maxPage);
+
+$start = ($page - 1) * 5;
+
+//投稿されたデータを5件分createdが新しい物から順に取得
+$posts = $db->prepare('SELECT m.name, m.user_image, p.* FROM members m, posts p WHERE m.id=p.member_id ORDER BY p.created DESC LIMIT ?,5');
+// executeだと文字列として値を渡してしまうのでbindParamを使って数字として渡す
+$posts->bindParam(1, $start, PDO::PARAM_INT);
+$posts->execute();
 
 //返信ボタンがクリックされた場合
 if(isset($_REQUEST['res'])){
@@ -104,8 +125,12 @@ if(isset($_REQUEST['res'])){
 <?php endforeach; ?>
 
 <ul class="paging">
-<li><a href="index.php?page=">前のページへ</a></li>
-<li><a href="index.php?page=">次のページへ</a></li>
+<?php if($page > 1): ?>
+<li><a href="index.php?page=<?php print($page-1); ?>">前のページへ</a></li>
+<?php endif; ?>
+<?php if($page < $maxPage): ?>
+<li><a href="index.php?page=<?php print($page+1); ?>">次のページへ</a></li>
+<?php endif; ?>
 </ul>
   </div>
 </div>
