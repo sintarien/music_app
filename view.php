@@ -10,6 +10,9 @@ if($_REQUEST['id']){
 $posts = $db->prepare('SELECT m.name, m.user_image, p.* FROM members m, posts p WHERE m.id=p.member_id AND p.id=?');
 $posts->execute(array($_REQUEST['id']));
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
